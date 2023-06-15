@@ -45,13 +45,7 @@ for i in range(14):
     for index, row in df.iterrows():
         print(f'Class: {row["name"]}, Confidence: {row["confidence"]}')
 
-        if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and row["confidence"] >= 0.6:
-            # if row["name"]=="1p":
-            #     results.append(("hai{0}.jpg".format(i), "2p"))
-            # elif row["name"]=="2p":
-            #     results.append(("hai{0}.jpg".format(i), "1p"))
-            #else:
-            
+        if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and row["confidence"] >= 0.6:            
             results.append(("hai{0}.jpg".format(i),row["name"]))
 
         if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and row["confidence"] >= 0.3 and row["confidence"] < 0.6:
@@ -59,7 +53,7 @@ for i in range(14):
 
     
     if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and check_tuple_list(kouho, 'hai{0}.jpg'.format(i)) == False:
-        kouho.append("hai{0}.jpg".format(i),"null","null")
+        kouho.append(("hai{0}.jpg".format(i),100,100))
 
 
 pprint.pprint(results)
@@ -68,11 +62,14 @@ pprint.pprint(kouho)
 return_list = test4.judge(kouho)
 print(return_list)
 
-img_name = name.return_name(return_list)
+img_name = []
+for y in return_list:
+    img_name.append(name.no_to_name(y))
 
 for x in range(len(kouho)):
     results.append((kouho[x][0],img_name[x]))
 
+results = sorted(results,key = lambda x: x[0])
 pprint.pprint(results)
 
 

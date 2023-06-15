@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pprint
+import name
 
 def read_tmp():
     hai = []
@@ -92,21 +93,65 @@ def ruizido(tehai_img,hai):
     return match_num
         
 def judge(tuple_list):
-    
+
     return_list = []
     temp_hai = read_tmp()
 
     for i in tuple_list:
         img = cv2.imread("tri_img/"+(i[0]))
-
-        #類似度チェック
+        #マッチ数
         ruizido_list = ruizido(img,temp_hai)
         ruizido_sorted = sorted(ruizido_list, key=lambda x: x[0],reverse=True)
-        hai_no = ruizido_sorted[0][1]
 
+        if i[1] == 100:
+            hai = ruizido_sorted[0][1]
+            return_list.append(hai)
+            continue
+        
+        no = name.name_to_no(i[1])
+        rate = i[2]
+
+        akaze_sum = 1.0
+        ai_sum = 0.0
+        n = 1.0
+        p = 1.0
+        for k in ruizido_sorted:
+            if no == k[1]:
+                ai_sum = ai_sum + n
+            n += 1.0
+
+        #距離
         dis_sorted = sorted(ruizido_sorted, key=lambda x: x[2])
+        for j in dis_sorted:
+            if no == j[1]:
+                ai_sum = ai_sum + p
+            if ruizido_sorted[0][1] == j[1]:
+                akaze_sum = akaze_sum + p
+            p += 1.0
 
-        return_list.append(hai_no)
+        akaze_sum = (akaze_sum / 10.0) + rate
+        ai_sum = ai_sum / 10.0
+
+        if no != ruizido_sorted[0][1]:
+            if akaze_sum < ai_sum:
+                print("akaze:{0}, ai:{1}".format(akaze_sum,ai_sum))
+                hai = ruizido_sorted[0][1]
+                if abs(akaze_sum - ai_sum) <= 0.02:
+                    if rate > 0.5:
+                        hai = no
+                    else:
+                        hai = ruizido_sorted[0][1]
+            else:
+                hai = no
+                if abs(akaze_sum - ai_sum) <= 0.02:
+                    if rate > 0.5:
+                        hai = no
+                    else:
+                        hai = ruizido_sorted[0][1]
+        else:
+            hai = no
+
+        return_list.append(hai)
     
     return return_list
 
