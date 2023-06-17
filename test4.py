@@ -99,7 +99,7 @@ def judge(tuple_list):
 
     for i in tuple_list:
         img = cv2.imread("tri_img/"+(i[0]))
-        #マッチ数
+        
         ruizido_list = ruizido(img,temp_hai)
         ruizido_sorted = sorted(ruizido_list, key=lambda x: x[0],reverse=True)
 
@@ -107,7 +107,7 @@ def judge(tuple_list):
             hai = ruizido_sorted[0][1]
             return_list.append(hai)
             continue
-        
+
         no = name.name_to_no(i[1])
         rate = i[2]
 
@@ -115,6 +115,7 @@ def judge(tuple_list):
         ai_sum = 0.0
         n = 1.0
         p = 1.0
+        #マッチ数
         for k in ruizido_sorted:
             if no == k[1]:
                 ai_sum = ai_sum + n
@@ -134,7 +135,7 @@ def judge(tuple_list):
 
         if no != ruizido_sorted[0][1]:
             if akaze_sum < ai_sum:
-                print("akaze:{0}, ai:{1}".format(akaze_sum,ai_sum))
+                #print("akaze:{0}, ai:{1}".format(akaze_sum,ai_sum))
                 hai = ruizido_sorted[0][1]
                 if abs(akaze_sum - ai_sum) <= 0.02:
                     if rate > 0.5:
