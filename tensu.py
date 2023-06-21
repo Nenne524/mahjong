@@ -7,18 +7,19 @@ import test4
 import name
 
 def check_tuple_list(tuple_list, a):
+    count = 0
     for item in tuple_list:
         if item[0] == a:
-            return True
-    return False
+            count += 1
+    return count
 
-# 学習済みモデルのパス
+#学習済みモデルのパス
 model_path = 'best.pt'
 
-# GPUを使用する場合
+#GPUを使用する場合
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# 学習済みモデルの読み込み
+#学習済みモデルの読み込み
 model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
 
 #確定結果を格納
@@ -43,24 +44,32 @@ for i in range(14):
     df = result.pandas().xyxy[0]
     # 検出されたクラスと信頼度を表示
     for index, row in df.iterrows():
-        print(f'Class: {row["name"]}, Confidence: {row["confidence"]}')
+        if row["confidence"] >= 0.6:   
+            if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == 0:       
+                results.append(("hai{0}.jpg".format(i),row["name"],row["confidence"]))
+            else:
+                jg_1 = results.pop()
+                if jg_1[2] > row["confidence"]:
+                    results.append(jg_1)
+                else:
+                    results.append(("hai{0}.jpg".format(i),row["name"],row["confidence"]))
 
-        if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and row["confidence"] >= 0.6:            
-            results.append(("hai{0}.jpg".format(i),row["name"]))
-
-        if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and row["confidence"] >= 0.3 and row["confidence"] < 0.6:
-            kouho.append(("hai{0}.jpg".format(i),row["name"],row["confidence"]))
+        if row["confidence"] >= 0.3 and row["confidence"] < 0.6:
+            if check_tuple_list(kouho, 'hai{0}.jpg'.format(i)) == 0:
+                if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == 0:
+                    kouho.append(("hai{0}.jpg".format(i),row["name"],row["confidence"]))
+            else:
+                jg_2 = kouho.pop()
+                if jg_2[2] > row["confidence"]:
+                    kouho.append(jg_2)
+                else:
+                    kouho.append(("hai{0}.jpg".format(i),row["name"],row["confidence"]))
 
     
-    if check_tuple_list(results, 'hai{0}.jpg'.format(i)) == False and check_tuple_list(kouho, 'hai{0}.jpg'.format(i)) == False:
+    if check_tuple_list(results, "hai{0}.jpg".format(i)) == 0 and check_tuple_list(kouho, "hai{0}.jpg".format(i)) == 0:
         kouho.append(("hai{0}.jpg".format(i),100,100))
 
-
-pprint.pprint(results)
-pprint.pprint(kouho)
-
 return_list = test4.judge(kouho)
-print(return_list)
 
 img_name = []
 for y in return_list:

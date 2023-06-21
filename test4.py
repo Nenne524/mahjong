@@ -4,7 +4,6 @@ import pprint
 import name
 
 def read_tmp():
-    hai = []
     #テンプレート
     #萬子
     itim = cv2.imread("hai/itim.jpg") #0
@@ -56,7 +55,7 @@ def read_tmp():
 def ruizido(tehai_img,hai):
     count = 0
     match_num = []
-    #A-KAZE検出器の生成
+    #AKAZE検出器の生成
     detector = cv2.AKAZE_create()
 
     for hai_i in hai:
@@ -98,6 +97,7 @@ def judge(tuple_list):
     temp_hai = read_tmp()
 
     for i in tuple_list:
+
         img = cv2.imread("tri_img/"+(i[0]))
         
         ruizido_list = ruizido(img,temp_hai)
@@ -105,6 +105,8 @@ def judge(tuple_list):
 
         if i[1] == 100:
             hai = ruizido_sorted[0][1]
+            if hai == 18 and ruizido_sorted[0][0] < 400:
+                    hai = ruizido_sorted[1][1]
             return_list.append(hai)
             continue
 
@@ -115,6 +117,12 @@ def judge(tuple_list):
         ai_sum = 0.0
         n = 1.0
         p = 1.0
+
+        if i[1] == '2s' or i[1] == '3s':
+            if i[2] > 0.4:
+                return_list.append(no)
+                continue
+
         #マッチ数
         for k in ruizido_sorted:
             if no == k[1]:
@@ -130,25 +138,15 @@ def judge(tuple_list):
                 akaze_sum = akaze_sum + p
             p += 1.0
 
-        akaze_sum = (akaze_sum / 10.0) + rate
-        ai_sum = ai_sum / 10.0
-
         if no != ruizido_sorted[0][1]:
+            akaze_sum = (akaze_sum / 11.0) + rate
+            ai_sum = ai_sum / 11.0
             if akaze_sum < ai_sum:
-                #print("akaze:{0}, ai:{1}".format(akaze_sum,ai_sum))
                 hai = ruizido_sorted[0][1]
-                if abs(akaze_sum - ai_sum) <= 0.02:
-                    if rate > 0.5:
-                        hai = no
-                    else:
-                        hai = ruizido_sorted[0][1]
+                if hai == 18 and ruizido_sorted[0][0] < 400:
+                    hai = ruizido_sorted[1][1]
             else:
                 hai = no
-                if abs(akaze_sum - ai_sum) <= 0.02:
-                    if rate > 0.5:
-                        hai = no
-                    else:
-                        hai = ruizido_sorted[0][1]
         else:
             hai = no
 

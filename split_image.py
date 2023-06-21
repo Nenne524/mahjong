@@ -7,9 +7,9 @@ def read_img():
     img = cv2.imread("/Users/yamaneami/image_media/detect_images/"+img_path)
     return img
 
-def richi_judge():
-    richi = input("0:立直していない, 1:立直した →　")
-    return int(richi)
+# def richi_judge():
+#     richi = input("0:立直していない, 1:立直した →　")
+#     return int(richi)
 
 def tri(img):
     #グレースケール
@@ -25,9 +25,8 @@ def tri(img):
         kernel = np.ones((5,5), np.uint8)
         img_thresh = cv2.morphologyEx(img_thresh, cv2.MORPH_OPEN, kernel)
 
-
-    cv2.imshow("ttt.jpg",img_thresh)
-    cv2.waitKey(0)
+    # cv2.imshow("ttt.jpg",img_thresh)
+    # cv2.waitKey(0)
     #輪郭を抽出
     contours = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
 
@@ -74,7 +73,7 @@ def main():
     img = read_img()
 
     #立直の有無
-    richi = richi_judge()
+    #richi = richi_judge()
 
     #トリミング
     tri_img = tri(img)
